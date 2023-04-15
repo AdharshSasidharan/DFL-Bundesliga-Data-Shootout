@@ -207,3 +207,26 @@ Then, the code is checking if a list called "video_one_list" has at least 101 it
 If it does, the code will take the 100th item from that list and display it on the figure.
 It will also print out the shape and size of that image.
 If the list does not have at least 101 items, then the code will print out a message saying so.
+
+import matplotlib.pyplot as plt
+
+fig, axis = plt.subplots(4, 4, figsize=(10, 10))
+
+if len(video_one_list) < 16:
+    print("Error: video_one_list does not have enough elements.")
+else:
+    for i, ax in enumerate(axis.flat):
+        IMG_From_List = video_one_list[i]
+        ax.set_xlabel(IMG_From_List.shape)
+        ax.imshow(IMG_From_List)
+
+    plt.tight_layout()
+    plt.show()
+ exp:
+This is a code in Python using a library called Matplotlib which allows you to create visualizations. Specifically, this code creates a grid of 4x4 images from a list of images.
+The first line of code imports the Matplotlib library and renames it as "plt". This is done to make the code shorter and easier to read.
+The second line of code creates a figure object and a set of subplots with a 4x4 layout, and sets the size of the figure to be 10 inches by 10 inches. This is where the images will be plotted.
+The next part of the code checks if the length of a list called "video_one_list" is less than 16. If it is less than 16, it means there aren't enough images in the list to plot on the grid, and an error message will be printed.
+If there are at least 16 images in the list, the code will run a loop to plot each image in the grid.
+For each image in the list, the code sets a variable called "IMG_From_List" to be the current image. It then sets the x-axis label of the current subplot to be the shape of the image, and plots the image on the current subplot using the "imshow" function.
+Finally, the "tight_layout" function is called to make sure the subplots are spaced out evenly, and the "show" function is called to display the grid of images.
