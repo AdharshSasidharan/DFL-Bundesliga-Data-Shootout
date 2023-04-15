@@ -86,3 +86,17 @@ The x-axis will show the video ID, and the y-axis will show the number of events
 Each bar in the chart will be colored based on the type of event that occurred.
 The chart will be titled "Event types throw videos". 
 Finally, the chart will be displayed on the screen using the "show" method.
+
+import plotly.express as px
+fig_3 = px.bar(train.query('event not in ["start","end"]')\
+    .groupby('video_id')['event'].value_counts().unstack(),orientation='h')
+fig_3.show()
+exp:
+This code is using a Python library called Plotly Express to create a bar chart.
+The data for the chart is coming from a table or dataset called 'train'.
+The first line of code is importing the Plotly Express library and giving it the nickname 'px' to make it easier to use later on.
+The second line of code is creating a variable called 'fig_3', which will hold the chart.
+The third line of code is telling the chart to use the 'train' dataset, but only select rows where the 'event' column does not contain the words "start" or "end".
+The fourth line of code is telling the chart to group the remaining rows by 'video_id', and count how many times each value appears in the 'event' column.
+The fifth line of code is telling the chart to display the counts as horizontal bars.
+The sixth line of code is displaying the chart.
