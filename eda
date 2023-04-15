@@ -7,10 +7,44 @@ import cv2
 # Input data files are available in the read-only "../input/" directory
 # For example, running this  will list all files under the input directory
 import os
+exp:
+This code is importing various libraries in Python to perform data analysis, visualization, and image processing.
+The 'numpy' library is used for performing mathematical operations on arrays and matrices, while 'pandas' library is used to read and manipulate datasets stored in CSV file format.
+'plotly.express' library is used to create interactive and customizable visualizations of the data. 'matplotlib' library is used to create static visualizations.
+The 'statsmodels.graphics.mosaicplot' library is used to create mosaic plots, which are used to visualize the relationship between two categorical variables.
+The 'cv2' library is used for image processing and computer vision applications.
+The code is also importing the 'os' library to access the input files, which are stored in a read-only directory named "../input/".
+
+
+
 
 train = pd.read_csv('train.csv')
+exp:
+This line of code reads a CSV (Comma Separated Values) file called 
+train.csv' and stores the data in a variable called 'train'. 
+The CSV file is likely to contain structured data, such as a table 
+of information with rows and columns, which can be easily read and
+analyzed by a computer program. The 'pd' in the code refers to a Python
+library called pandas which provides a set of functions to work with data.
+So, this line of code is using pandas library to read a CSV file and store the
+data in a variable for further use in a Python program.
 
 train.head()
+exp:
+This code is likely part of a program written in Python and it involves the use of a library called Pandas, which is often used for data analysis.
+The ".head()" function is being applied to a variable called "train". This variable probably contains a table of data, also known as a dataframe. The ".head()" function is used to display the first few rows of this table, usually the top 5 rows by default.
+So, this code is simply showing the first few rows of the "train" dataframe, allowing the user to quickly see what kind of data is contained in the table.
 
+train.tail()
+exp:
+This code is likely written in Python and is asking to display the bottom (or last) few rows of a table or data set that is called "train".
+The "train.tail()" function is a method in Python that is used to display the last few rows of a table or data set. The word "tail" is used because it refers to the end or bottom of something, similar to the tail of an animal.
+So, in summary, this code is asking to display the last few rows of a data set called "train".
+
+train.info()
+exp:
+This code is asking a computer program to give information about a
+"train" object. The information that is returned might include things 
+like the number of rows and columns in the "train" object, the data types of each column, and the amount of memory used by the "train" object. This information can be useful for understanding the data and how it is being processed by the program.
 
 
