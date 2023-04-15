@@ -1,0 +1,16 @@
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import plotly.express as px
+import matplotlib.pyplot as plt
+from statsmodels.graphics.mosaicplot import mosaic
+import cv2
+# Input data files are available in the read-only "../input/" directory
+# For example, running this  will list all files under the input directory
+import os
+
+train = pd.read_csv('train.csv')
+
+train.head()
+
+
+
