@@ -63,3 +63,16 @@ exp:
 This code is for analyzing a dataset of videos. It counts the number of times each video ID appears in the dataset and then prints the results.
 The video ID is a unique identifier assigned to each video in the dataset.
 So essentially, the code counts how many times each video has been included in the dataset and outputs that count for each video.
+
+Crosstable = pd.crosstab(train['event'], train['event_attributes'])
+Crosstable.style.background_gradient(cmap='Greens')
+exp:
+This code is using a library called pandas to create a table that shows how often certain events occur in a dataset.
+The dataset is called 'train', and the events are listed under 'event'. 
+The table will also show how these events are associated with different attributes, which are listed under 'event_attributes'.
+The code then adds a visual element to the table by applying a color gradient.
+This gradient will highlight cells in the table that have a higher count of events in a particular category, 
+making it easier to see patterns and relationships between the events and their attributes. 
+The gradient used in this code is called 'Greens', which means that cells with higher counts will be shaded with shades of green, 
+while cells with lower counts will be shaded with lighter greens or white.
+
