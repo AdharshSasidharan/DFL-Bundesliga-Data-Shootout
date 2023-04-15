@@ -230,3 +230,22 @@ The next part of the code checks if the length of a list called "video_one_list"
 If there are at least 16 images in the list, the code will run a loop to plot each image in the grid.
 For each image in the list, the code sets a variable called "IMG_From_List" to be the current image. It then sets the x-axis label of the current subplot to be the shape of the image, and plots the image on the current subplot using the "imshow" function.
 Finally, the "tight_layout" function is called to make sure the subplots are spaced out evenly, and the "show" function is called to display the grid of images.
+
+
+from IPython.display import Video, display
+
+def video(video_path, ratio=0.7):
+    nfl_video = Video(video_path,
+                      embed=True,
+                      height=int(720 * ratio),
+                      width=int(1280 * ratio))
+    return nfl_video
+    
+video('../Exploratory Data Analysis/test/019d5b34_0.mp4')
+exp:
+This code imports a library called IPython.display which provides a function called Video for displaying videos.
+The function video is defined to take two arguments: video_path, which specifies the path to the video file, and an optional argument called ratio which determines the size of the video display.
+Inside the video function, the Video function from the IPython.display library is used to create a video object nfl_video with the given video_path.
+The embed, height, and width parameters are also passed to the Video function to customize how the video will be displayed.
+Finally, the video function returns the nfl_video object which can then be displayed using the display function from the IPython.display library.
+The last line of code calls the video function with the path to a video file as an argument and displays the resulting video object.
