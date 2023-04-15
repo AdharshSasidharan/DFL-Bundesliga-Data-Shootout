@@ -47,4 +47,13 @@ This code is asking a computer program to give information about a
 "train" object. The information that is returned might include things 
 like the number of rows and columns in the "train" object, the data types of each column, and the amount of memory used by the "train" object. This information can be useful for understanding the data and how it is being processed by the program.
 
+train.isnull().sum()
+exp:
+This code is used to count the number of missing values (null values) in a dataset.
+"train" refers to a dataset that has been loaded into the program.
+".isnull()" is a function that checks each value in the dataset to see if it is null or missing.
+".sum()" is a function that adds up the total number of null values in each column of the dataset.
+So when we write "train.isnull().sum()", the program first checks for null values in the "train" dataset using the ".isnull()" function,
+and then adds up the total number of null values in each column using the ".sum()" function. The output of this code will be a list of the number 
+of null values in each column of the dataset.
 
