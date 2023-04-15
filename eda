@@ -100,3 +100,11 @@ The third line of code is telling the chart to use the 'train' dataset, but only
 The fourth line of code is telling the chart to group the remaining rows by 'video_id', and count how many times each value appears in the 'event' column.
 The fifth line of code is telling the chart to display the counts as horizontal bars.
 The sixth line of code is displaying the chart.
+
+train.query('video_id =="1606b0e6_0"& event not in ["start","end"]')\
+.groupby('event_attributes')['event'].value_counts().unstack()
+exp:
+This code is performing a series of operations on a data table called "train" which contains information about events related to video content.
+The first line of code is selecting a subset of the data where the "video_id" column has a specific value ("1606b0e6_0") and the "event" column does not have the values "start" or "end".
+The second line of code groups the remaining events by their "event_attributes" and counts the number of events for each "event" type within each "event_attributes" group.
+The final line of code rearranges the results into a table where the "event" types are listed as columns and the "event_attributes" are listed as rows. This allows for easy comparison of the frequency of each event type within each event attribute.
