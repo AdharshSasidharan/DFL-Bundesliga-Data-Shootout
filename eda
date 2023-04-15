@@ -143,3 +143,35 @@ exp:
 This code is performing a query on a dataset or table called "sub" to extract specific rows that meet certain conditions.
 The condition being checked is whether the "video_id" column contains the string "019d5b34_0" and the "event" column does not contain either "start" or "end" values.
 In simpler terms, the code is selecting rows from the dataset where a specific video is being watched, and where the user is not just starting or ending the video, but rather engaging with it in some other way.
+
+def video_list(Video_Path):
+    Video_IMG_List = []
+
+    Video_Cap = cv2.VideoCapture(Video_Path)
+
+
+    while Video_Cap.isOpened():
+
+
+        ret,frame = Video_Cap.read()
+
+        if ret != True:
+            break
+
+        if Video_Cap.isOpened():
+            Transformation_IMG = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+            Resize_IMG = cv2.resize(Transformation_IMG,(180,180))
+            Video_IMG_List.append(Resize_IMG)
+
+
+    Video_Cap.release()
+    return Video_IMG_List
+exp:
+This is a piece of code that takes a video file path as an input and returns a list of images that are extracted from the video.
+The first thing the code does is create an empty list called Video_IMG_List.
+Then it creates an object called Video_Cap that opens the video file specified in the input.
+Next, the code enters a loop that will run as long as there are frames left to extract from the video.
+Inside the loop, the code reads the next frame of the video using Video_Cap.read(). This returns two values: ret (short for "return value") and frame. ret is a Boolean value that indicates whether the frame was successfully read or not, and frame is the actual image data of the frame.
+If ret is not True, then the end of the video has been reached and the loop is exited.
+Otherwise, the code converts the color space of the frame from BGR to RGB using cv2.cvtColor(), resizes the frame to 180x180 pixels using cv2.resize(), and adds the resulting image to the Video_IMG_List using the append() method.
+Once all frames have been processed, the Video_Cap object is released using Video_Cap.release(), and the list of images is returned using return Video_IMG_List.
