@@ -127,3 +127,13 @@ The next line fig_4 = px.bar(sub, x='event', y='video_id', color='event', title=
 It uses data from the sub variable, and specifies that the x-axis should show the event column, the y-axis should show the video_id column, and the color of the bars should be based on the event column. 
 It also gives the graph a title.
 Finally, fig_4.show() displays the graph on the screen.
+
+fig_5 = px.bar(sub,x='video_id',y='score',
+             color='event',title = 'Score and events at each video')
+fig_5.show()
+exp:
+This code is creating a bar graph using a Python library called Plotly Express (px). 
+The data used for the graph is stored in a variable called 'sub'. 
+The graph has the video IDs on the x-axis, the score on the y-axis, and different events are distinguished by color. 
+The graph is given a title "Score and events at each video". 
+The final line of the code "fig_5.show()" displays the graph on the screen.
