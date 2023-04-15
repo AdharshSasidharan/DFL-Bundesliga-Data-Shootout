@@ -76,3 +76,13 @@ making it easier to see patterns and relationships between the events and their 
 The gradient used in this code is called 'Greens', which means that cells with higher counts will be shaded with shades of green, 
 while cells with lower counts will be shaded with lighter greens or white.
 
+fig_2 = px.bar(train,x='video_id',y='event',
+             color='event',title = 'Event types throw videos')
+fig_2.show()
+exp:
+This code is creating a bar chart using a Python library called Plotly Express.
+The chart will show the number of events that occurred for different videos.
+The x-axis will show the video ID, and the y-axis will show the number of events. 
+Each bar in the chart will be colored based on the type of event that occurred.
+The chart will be titled "Event types throw videos". 
+Finally, the chart will be displayed on the screen using the "show" method.
