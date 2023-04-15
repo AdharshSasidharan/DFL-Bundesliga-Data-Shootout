@@ -191,3 +191,19 @@ This code is using the Python programming language with the NumPy library to pri
 The "np.asarray" function is used to convert the "video_one_list" into a NumPy array. 
 Then, the "np.shape" function is used to get the shape of the NumPy array, which gives the dimensions of the array (i.e., how many rows and columns it has).
 Finally, the result is printed to the screen using the "print" function.
+
+figure = plt.figure(figsize=(8,8))
+
+if len(video_one_list) >= 101:
+    Pick_IMG = video_one_list[100]
+    plt.xlabel(str(Pick_IMG.shape))
+    plt.ylabel(str(Pick_IMG.size))
+    plt.imshow(Pick_IMG)
+else:
+    print("video_one_list does not have at least 101 items.")
+exp:
+This code is creating a figure with a size of 8 by 8 using a library called "matplotlib.pyplot".
+Then, the code is checking if a list called "video_one_list" has at least 101 items. 
+If it does, the code will take the 100th item from that list and display it on the figure.
+It will also print out the shape and size of that image.
+If the list does not have at least 101 items, then the code will print out a message saying so.
