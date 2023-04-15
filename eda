@@ -184,3 +184,10 @@ The video file is located in a folder named "test" which is located in a parent 
 The next line of code is calling a function named "video_list" and passing the "video_file" variable as an argument to the function. 
 The function is expected to return a list of items related to the video file, which will then be stored in a new variable named "video_one_list". 
 The exact details of what the function does and what items are returned in the list cannot be determined without seeing the implementation of the "video_list" function.
+
+print(np.shape(np.asarray(video_one_list)))
+exp:
+This code is using the Python programming language with the NumPy library to print the shape of a list called "video_one_list".
+The "np.asarray" function is used to convert the "video_one_list" into a NumPy array. 
+Then, the "np.shape" function is used to get the shape of the NumPy array, which gives the dimensions of the array (i.e., how many rows and columns it has).
+Finally, the result is printed to the screen using the "print" function.
