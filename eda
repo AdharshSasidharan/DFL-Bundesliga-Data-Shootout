@@ -108,3 +108,22 @@ This code is performing a series of operations on a data table called "train" wh
 The first line of code is selecting a subset of the data where the "video_id" column has a specific value ("1606b0e6_0") and the "event" column does not have the values "start" or "end".
 The second line of code groups the remaining events by their "event_attributes" and counts the number of events for each "event" type within each "event_attributes" group.
 The final line of code rearranges the results into a table where the "event" types are listed as columns and the "event_attributes" are listed as rows. This allows for easy comparison of the frequency of each event type within each event attribute.
+
+import pandas as pd
+sub = pd.read_csv('sample_submission.csv')
+sub.head()
+exp:
+This code is using a programming language called Python to import a library called pandas, which helps to manipulate data.
+Then, it reads a file called 'sample_submission.csv' using the 'read_csv' function provided by pandas, which creates a table-like data structure called a DataFrame.
+Finally, it displays the first few rows of this DataFrame using the 'head' function, so that you can see what the data looks like.
+
+import plotly.express as px
+fig_4 = px.bar(sub,x='event',y='video_id',color = 'event',title = 'Event types and the score')
+fig_4.show()
+exp:
+This code uses a Python package called plotly to create a bar graph.
+The import plotly.express as px line tells Python to import a specific part of the plotly package, which is called express.
+The next line fig_4 = px.bar(sub, x='event', y='video_id', color='event', title='Event types and the score') creates a new bar graph called fig_4. 
+It uses data from the sub variable, and specifies that the x-axis should show the event column, the y-axis should show the video_id column, and the color of the bars should be based on the event column. 
+It also gives the graph a title.
+Finally, fig_4.show() displays the graph on the screen.
