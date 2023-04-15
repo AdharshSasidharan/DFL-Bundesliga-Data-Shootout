@@ -175,3 +175,12 @@ Inside the loop, the code reads the next frame of the video using Video_Cap.read
 If ret is not True, then the end of the video has been reached and the loop is exited.
 Otherwise, the code converts the color space of the frame from BGR to RGB using cv2.cvtColor(), resizes the frame to 180x180 pixels using cv2.resize(), and adds the resulting image to the Video_IMG_List using the append() method.
 Once all frames have been processed, the Video_Cap object is released using Video_Cap.release(), and the list of images is returned using return Video_IMG_List.
+
+video_file = '../Exploratory Data Analysis/test/019d5b34_0.mp4'
+video_one_list = video_list(video_file)
+exp:
+This code is creating a variable named "video_file" which contains the file path of a video file.
+The video file is located in a folder named "test" which is located in a parent directory of the current directory.
+The next line of code is calling a function named "video_list" and passing the "video_file" variable as an argument to the function. 
+The function is expected to return a list of items related to the video file, which will then be stored in a new variable named "video_one_list". 
+The exact details of what the function does and what items are returned in the list cannot be determined without seeing the implementation of the "video_list" function.
