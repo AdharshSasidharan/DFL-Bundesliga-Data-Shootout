@@ -57,3 +57,9 @@ So when we write "train.isnull().sum()", the program first checks for null value
 and then adds up the total number of null values in each column using the ".sum()" function. The output of this code will be a list of the number 
 of null values in each column of the dataset.
 
+x=train['video_id'].value_counts()
+print(x)
+exp:
+This code is for analyzing a dataset of videos. It counts the number of times each video ID appears in the dataset and then prints the results.
+The video ID is a unique identifier assigned to each video in the dataset.
+So essentially, the code counts how many times each video has been included in the dataset and outputs that count for each video.
