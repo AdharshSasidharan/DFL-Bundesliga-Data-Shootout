@@ -194,7 +194,30 @@ def predict(model, dataloader):
  submission_example = pd.read_csv("drive/MyDrive/DFL-Bundesliga-Data-Shootout1/sample_submission.csv")
 submission_example.head()
  
- 
+
+I throw out the events end and start and than assign to each second one of the relevant events (so challenge, throwin, play).
+The reason why I can do this is because at th scoring only those times will be considered, that are near to the solution,
+the other will be rejected. At least it is what is said in the description of the Competition evaluation.
+
+def func(x):
+    D = {0:"challenge", 1:"throwin", 2:"play"}
+    max_arg = np.argmax(x)
+    return D[max_arg], x[max_arg]
+D = {0:"challenge", 1:"throwin", 2:"play"}
+scores_new = np.delete(scores, [3,4], axis = 1)
+out_list = list(map(func, scores_new))
+pred_events = []
+pred_scores = []
+for row in out_list:
+    pred_events.append(row[0])
+    pred_scores.append(row[1])
+    
+    
+D_dataframe = {"video_id": ids, "time":times, "event":pred_events, "score":pred_scores}
+submission = pd.DataFrame(D_dataframe)
+submission.head()
+
+submission.to_csv("submission.csv", index = False)
        
         
   
