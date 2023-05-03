@@ -155,6 +155,41 @@ class LSTM_and_CNN(nn.Module):
         out = self.model_lstm(features)
         return out
         
+ Load the Dataset     
+ 
+batch_size = 1
+test_loader = DataLoader(
+    VideoFramePredictDataset(df_test), 
+    batch_size=batch_size, 
+    shuffle=False, 
+    num_workers=1
+)
+
+Predicting
+def predict(model, dataloader):
+    model.to(device)
+    model.eval()
+    dataloader = dataloader
+    outputs = []
+    ids = []
+    times = []
+    s = nn.Softmax(dim=1).to(device)
+    for video_clip, t, video_id in tqdm(dataloader, leave=False):
+        if time.time() - TIME_START > MAX_TIME_TO_RUN:
+            break
+        times.append(int(t))
+        ids.append(video_id[0])
+        try:
+            frames = video_clip.to(device).float()
+            output = model(frames)
+            outputs.append(s(output.cpu()[:,:5])[0].detach().numpy())
+        except Exception as e:
+            outputs.append(s(torch.tensor([[1, 1, 1 ,1, 1]]).float())[0].detach().numpy())
+    return np.array(outputs), times, ids
+    
+ scores, times, ids = predict(model, test_loader)
+ 
+ 
        
         
   
