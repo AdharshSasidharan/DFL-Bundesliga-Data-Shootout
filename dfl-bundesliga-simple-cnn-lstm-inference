@@ -190,6 +190,11 @@ def predict(model, dataloader):
  scores, times, ids = predict(model, test_loader)
  
  
+ Submitting 🚀
+ submission_example = pd.read_csv("drive/MyDrive/DFL-Bundesliga-Data-Shootout1/sample_submission.csv")
+submission_example.head()
+ 
+ 
        
         
   
