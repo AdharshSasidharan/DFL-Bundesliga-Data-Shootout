@@ -1,6 +1,116 @@
 from google.colab import drive
 drive.mount('/content/drive')
+
 This is the inference of the trained LSTM&CNN model.
 Here I predict the events for every second of the given test data. 
 Since it was not specified exactly how big is the train dataset I set the counter MAX_TIME_TO_RUN to prevent that the runtime of the notebook exceeds the limits of the competition 
 (maximum is 9hrs, but I set to 6 just for the example).
+
+Import libraries
+
+import os
+import subprocess
+import gc
+import cv2
+import copy
+import time
+import random
+import string
+import joblib
+import numpy as np 
+import pandas as pd 
+import torch
+import time
+import glob
+import seaborn as sns
+import matplotlib.pyplot as plt
+import torchvision.transforms as transforms
+import torch.nn.functional as F
+
+from torch import nn
+from torchvision import models
+from torch.utils.data import Dataset, DataLoader
+from sklearn.model_selection import train_test_split
+from tqdm.notebook import tqdm
+from torch.optim import lr_scheduler
+
+import warnings
+warnings.filterwarnings("ignore")
+
+
+pd.options.display.max_colwidth = 1000
+
+gc.enable()
+target_size = "384x216"  # 20% of FullHD
+os.environ["NVIDIA_VISIBLE_DEVICES"] = "all"
+TIME_START = time.time()
+MAX_TIME_TO_RUN = 3600*6
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print(device)
+
+Looking at the durations of all given test videos
+test_paths = glob.glob("drive/MyDrive/DFL-Bundesliga-Data-Shootout1/test/*.mp4")
+N_files = len(test_paths)
+
+durations = []
+for path in test_paths:
+    cap = cv2.VideoCapture(path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    durations.append(frame_count/fps)
+    
+    Creating test_df
+    times = []
+paths = []
+video_ids = []
+for time_to_end, path in zip(durations,test_paths):
+    TIME_SPLIT = 1 # 25 frames
+    time_line = np.arange(0,time_to_end,TIME_SPLIT)
+    video_id = os.path.splitext(os.path.basename(path))[0]
+    times.extend(time_line)
+    paths.extend([path]*len(time_line))
+    video_ids.extend([video_id]*len(time_line))
+D = {"video_id": video_ids,"time":times, "file_path":paths}
+df_test = pd.DataFrame(D)
+df_test.iloc[25:35]
+
+Dataset
+class VideoFramePredictDataset(Dataset):
+    def __init__(self, df):
+        self.df = df
+        self.frames_split = 25 * TIME_SPLIT # 25 frames per second
+        
+    def __len__(self):
+        return self.df.shape[0]
+    
+    def __getitem__(self, index):
+        file_path = self.df.iloc[index].file_path
+        t = self.df.iloc[index].time
+        video_id = self.df.iloc[index].video_id
+        video_clip = np.zeros((self.frames_split, 128, 128, 3))
+        try:
+            cap = cv2.VideoCapture(file_path)
+        except:
+            return np.zeros((self.frames_split, 3, 128, 128))
+        try:
+            cap.set(cv2.CAP_PROP_POS_FRAMES,t*self.frames_split)
+        except:
+            pass
+        for i in range(self.frames_split):
+            try:
+                _, frame = cap.read()
+            except:
+                frame = np.zeros((128,128,3))
+            try:
+                frame = cv2.resize(frame, (128,128))
+            except:
+                frame = np.zeros((128,128,3))
+            video_clip[i] = frame
+        try:
+            video_clip = video_clip.transpose(0, 3, 1, 2)
+        except:
+            video_clip = np.zeros((self.frames_split, 3, 128, 128))
+        return torch.from_numpy(video_clip), t, video_id
+        
+  
