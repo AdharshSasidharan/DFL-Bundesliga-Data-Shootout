@@ -1,0 +1,246 @@
+explain this below code in understandable way
+
+from google.colab import drive
+drive.mount('/content/drive')
+
+This is the inference of the trained LSTM&CNN model.
+Here I predict the events for every second of the given test data. 
+Since it was not specified exactly how big is the train dataset I set the counter MAX_TIME_TO_RUN to prevent that the runtime of the notebook exceeds the limits of the competition 
+(maximum is 9hrs, but I set to 6 just for the example).
+
+Import libraries
+
+import os
+import subprocess
+import gc
+import cv2
+import copy
+import time
+import random
+import string
+import joblib
+import numpy as np 
+import pandas as pd 
+import torch
+import time
+import glob
+import seaborn as sns
+import matplotlib.pyplot as plt
+import torchvision.transforms as transforms
+import torch.nn.functional as F
+
+from torch import nn
+from torchvision import models
+from torch.utils.data import Dataset, DataLoader
+from sklearn.model_selection import train_test_split
+from tqdm.notebook import tqdm
+from torch.optim import lr_scheduler
+
+import warnings
+warnings.filterwarnings("ignore")
+
+
+pd.options.display.max_colwidth = 1000
+
+gc.enable()
+target_size = "384x216"  # 20% of FullHD
+os.environ["NVIDIA_VISIBLE_DEVICES"] = "all"
+TIME_START = time.time()
+MAX_TIME_TO_RUN = 3600*6
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print(device)
+
+Looking at the durations of all given test videos
+test_paths = glob.glob("drive/MyDrive/DFL-Bundesliga-Data-Shootout1/test/*.mp4")
+N_files = len(test_paths)
+
+durations = []
+for path in test_paths:
+    cap = cv2.VideoCapture(path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    durations.append(frame_count/fps)
+    
+    Creating test_df
+    times = []
+paths = []
+video_ids = []
+for time_to_end, path in zip(durations,test_paths):
+    TIME_SPLIT = 1 # 25 frames
+    time_line = np.arange(0,time_to_end,TIME_SPLIT)
+    video_id = os.path.splitext(os.path.basename(path))[0]
+    times.extend(time_line)
+    paths.extend([path]*len(time_line))
+    video_ids.extend([video_id]*len(time_line))
+D = {"video_id": video_ids,"time":times, "file_path":paths}
+df_test = pd.DataFrame(D)
+df_test.iloc[25:35]
+
+Dataset
+class VideoFramePredictDataset(Dataset):
+    def __init__(self, df):
+        self.df = df
+        self.frames_split = 25 * TIME_SPLIT # 25 frames per second
+        
+    def __len__(self):
+        return self.df.shape[0]
+    
+    def __getitem__(self, index):
+        file_path = self.df.iloc[index].file_path
+        t = self.df.iloc[index].time
+        video_id = self.df.iloc[index].video_id
+        video_clip = np.zeros((self.frames_split, 128, 128, 3))
+        try:
+            cap = cv2.VideoCapture(file_path)
+        except:
+            return np.zeros((self.frames_split, 3, 128, 128))
+        try:
+            cap.set(cv2.CAP_PROP_POS_FRAMES,t*self.frames_split)
+        except:
+            pass
+        for i in range(self.frames_split):
+            try:
+                _, frame = cap.read()
+            except:
+                frame = np.zeros((128,128,3))
+            try:
+                frame = cv2.resize(frame, (128,128))
+            except:
+                frame = np.zeros((128,128,3))
+            video_clip[i] = frame
+        try:
+            video_clip = video_clip.transpose(0, 3, 1, 2)
+        except:
+            video_clip = np.zeros((self.frames_split, 3, 128, 128))
+        return torch.from_numpy(video_clip), t, video_id
+  
+  Loading the model
+Architecture
+class CNN(nn.Module):
+    def __init__(self):
+        super(CNN, self).__init__()
+        
+        self.conv1 = nn.Conv2d(3, 10, 5)
+        self.conv2 = nn.Conv2d(10, 20, 5)
+        self.conv3 = nn.Conv2d(20, 30, 5)
+        
+    def forward(self, i):
+        x = i.view(-1, i.shape[2], i.shape[3], i.shape[4])
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = nn.AvgPool2d(4)(x)
+        x = x.view(i.shape[0], i.shape[1], -1)
+        return x
+    
+class LSTM(nn.Module):
+    def __init__(self):
+        super(LSTM, self).__init__()
+        self.lstm = nn.LSTM(25230, 100)
+        self.fc = nn.Linear(2500, 5)
+        
+    def forward(self, x):
+        x, _ = self.lstm(x)
+        x = x.view(x.shape[0], -1)
+        x = self.fc(x)
+        return x    
+
+class LSTM_and_CNN(nn.Module):
+    def __init__(self):
+        super(LSTM_and_CNN, self).__init__()
+        self.model_cnn = CNN().to(device)
+        self.model_lstm = LSTM().to(device)
+    
+    def forward(self, x):
+        features = self.model_cnn(x)
+        out = self.model_lstm(features)
+        return out
+        
+ Load the Dataset     
+ 
+batch_size = 1
+test_loader = DataLoader(
+    VideoFramePredictDataset(df_test), 
+    batch_size=batch_size, 
+    shuffle=False, 
+    num_workers=1
+)
+
+Predicting
+def predict(model, dataloader):
+    model.to(device)
+    model.eval()
+    dataloader = dataloader
+    outputs = []
+    ids = []
+    times = []
+    s = nn.Softmax(dim=1).to(device)
+    for video_clip, t, video_id in tqdm(dataloader, leave=False):
+        if time.time() - TIME_START > MAX_TIME_TO_RUN:
+            break
+        times.append(int(t))
+        ids.append(video_id[0])
+        try:
+            frames = video_clip.to(device).float()
+            output = model(frames)
+            outputs.append(s(output.cpu()[:,:5])[0].detach().numpy())
+        except Exception as e:
+            outputs.append(s(torch.tensor([[1, 1, 1 ,1, 1]]).float())[0].detach().numpy())
+    return np.array(outputs), times, ids
+    
+ scores, times, ids = predict(model, test_loader)
+ 
+ 
+ Submitting 🚀
+ submission_example = pd.read_csv("drive/MyDrive/DFL-Bundesliga-Data-Shootout1/sample_submission.csv")
+submission_example.head()
+ 
+
+I throw out the events end and start and than assign to each second one of the relevant events (so challenge, throwin, play).
+The reason why I can do this is because at th scoring only those times will be considered, that are near to the solution,
+the other will be rejected. At least it is what is said in the description of the Competition evaluation.
+
+def func(x):
+    D = {0:"challenge", 1:"throwin", 2:"play"}
+    max_arg = np.argmax(x)
+    return D[max_arg], x[max_arg]
+D = {0:"challenge", 1:"throwin", 2:"play"}
+scores_new = np.delete(scores, [3,4], axis = 1)
+out_list = list(map(func, scores_new))
+pred_events = []
+pred_scores = []
+for row in out_list:
+    pred_events.append(row[0])
+    pred_scores.append(row[1])
+    
+    
+D_dataframe = {"video_id": ids, "time":times, "event":pred_events, "score":pred_scores}
+submission = pd.DataFrame(D_dataframe)
+submission.head()
+
+submission.to_csv("submission.csv", index = False)
+       
+        
+  
+
+ChatGPT
+This code is written in Python programming language and consists of various libraries, classes, and functions that are being used for predicting events for every second of a given test data.
+
+Firstly, some libraries are imported which are used to run this code. These libraries are os, subprocess, gc, cv2, copy, time, random, string, joblib, numpy, pandas, torch, seaborn, matplotlib, torchvision.transforms, torch.nn.functional, torch.utils.data, tqdm.notebook, torch.optim, and warnings.
+
+After importing the required libraries, a maximum time to run the notebook is set to 6 hours. Then, the device is checked whether it is GPU or CPU. If it is GPU, then "cuda:0" is printed, and if it is CPU, then "cpu" is printed.
+
+After that, durations of all given test videos are calculated and saved in a list. The test dataset is created in such a way that the predicted results of every second of each test video can be stored. For this purpose, times, paths, and video ids are defined and then saved in a dataframe named df_test.
+
+A class named VideoFramePredictDataset is defined that takes the df_test dataframe as input and returns video clips in the form of torch tensors. These tensors contain 25 frames per second and have a size of 128x128.
+
+Then, the CNN and LSTM classes are defined to construct the model. The CNN class takes 3 input channels and has 3 convolutional layers with increasing numbers of filters. In the forward function of this class, the input tensor is reshaped and passed through these three convolutional layers followed by a ReLU activation function. After that, the tensor is passed through an Average Pooling layer and reshaped to its original size.
+
+The LSTM class takes an input tensor with 25230 features and has an LSTM layer with 100 hidden units followed by a fully connected layer with 5 output units. In the forward function of this class, the input tensor is passed through the LSTM layer and reshaped before being passed through the fully connected layer.
+
+Finally, the LSTM_and_CNN class is defined to combine the CNN and LSTM models. In the forward function of this class, the input tensor is passed through the CNN model first, and then the output tensor is passed through the LSTM model.
+
+The next step is to load the trained model, which is an instance of the LSTM_and_CNN class, using the torch.load function. Then, the trained model is set to the evaluation mode using the eval function.
+
+Finally, the for loop is defined that iterates over every second of each video clip in the test dataset. The predicted results are saved in a dataframe named df_submit. The predicted results are in the form of an integer, which represents the action class, and a float, which represents the confidence score for that action class.
