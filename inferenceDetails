@@ -224,7 +224,7 @@ submission.to_csv("submission.csv", index = False)
         
   
 
-ChatGPT
+
 This code is written in Python programming language and consists of various libraries, classes, and functions that are being used for predicting events for every second of a given test data.
 
 Firstly, some libraries are imported which are used to run this code. These libraries are os, subprocess, gc, cv2, copy, time, random, string, joblib, numpy, pandas, torch, seaborn, matplotlib, torchvision.transforms, torch.nn.functional, torch.utils.data, tqdm.notebook, torch.optim, and warnings.
